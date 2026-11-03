@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LocalFictionReader.Models;
 using Windows.Storage;
+// IBuffer 位于 Windows.Storage.Streams（不是 Windows.Storage），
+// ToArray() 扩展来自 System.Runtime.InteropServices.WindowsRuntime。
+using Windows.Storage.Streams;
 
 namespace LocalFictionReader.Services
 {
