@@ -1,0 +1,46 @@
+name: Build (UWP)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: MSBuild x64 (Debug)
+    # UWP 工程用的是旧式 csproj + Microsoft.Windows.UI.Xaml.CSharp.targets，
+    # 必须跑在带 Windows SDK 10.0.19041 + UWP 工作负载的 Windows runner 上。
+    # 注意：不要改成 windows-latest，新镜像不再带 19041 SDK。
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: |
+          nuget restore LocalFictionReader.sln
+          msbuild LocalFictionReader.sln -t:restore -p:Configuration=Debug -p:Platform=x64
+
+      - name: Build (x64 Debug, unsigned)
+        run: >
+          msbuild LocalFictionReader\LocalFictionReader.csproj
+          -p:Configuration=Debug
+          -p:Platform=x64
+          -p:AppxPackageSigningEnabled=false
+          -p:AppxBundle=Never
+          -p:UapAppxPackageBuildMode=SideloadOnly
+          -p:UseSharedCompilation=false
+          -verbosity:minimal
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: LocalFictionReader-x64
+          path: |
+            LocalFictionReader/AppPackages/**
+            LocalFictionReader/bin/x64/Debug/**
+          if-no-files-found: warn
