@@ -24,10 +24,11 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <ListView ItemsSource="{x:Bind ViewModel.Books}" DisplayMemberPath="Title"
+            <ListView x:Name="BooksList" ItemsSource="{x:Bind ViewModel.Books}" DisplayMemberPath="Title"
+                      SelectedItem="{x:Bind ViewModel.SelectedBook, Mode=TwoWay}"
                       SelectionMode="Single" Grid.Column="0"/>
 
-            <ListView ItemsSource="{x:Bind SelectedBook.Chapters}" DisplayMemberPath="Title"
+            <ListView ItemsSource="{x:Bind ViewModel.SelectedBook.Chapters, Mode=OneWay}" DisplayMemberPath="Title"
                       SelectionMode="Single" Grid.Column="1" Margin="10,0,0,0"/>
         </Grid>
     </Grid>

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using LocalFictionReader.Services;
 using LocalFictionReader.ViewModels;
