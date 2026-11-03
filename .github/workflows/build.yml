@@ -10,15 +10,41 @@ jobs:
   build:
     name: MSBuild x64 (Debug)
     # UWP 工程用的是旧式 csproj + Microsoft.Windows.UI.Xaml.CSharp.targets，
-    # 必须跑在带 Windows SDK 10.0.19041 + UWP 工作负载的 Windows runner 上。
-    # 注意：不要改成 windows-latest，新镜像不再带 19041 SDK。
+    # 需要 Windows SDK 10.0.19041 + UWP 工作负载。GitHub 的 windows-2022 镜像
+    # 自带 19041 SDK，但**默认没有安装 UWP 工作负载**，所以下面要先补装。
     runs-on: windows-2022
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
+
+      - name: Install UWP workload (Universal Windows Platform build tools)
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $installPath = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+          if (-not $installPath) { throw "Visual Studio installation not found" }
+          Write-Host "VS install path: $installPath"
+          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          Write-Host "Adding Microsoft.VisualStudio.Workload.Universal ..."
+          $args = @(
+            'modify',
+            '--installPath', $installPath,
+            '--add', 'Microsoft.VisualStudio.Workload.Universal',
+            '--includeRecommended',
+            '--quiet',
+            '--norestart',
+            '--nocache'
+          )
+          $p = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
+          Write-Host "vs_installer exit code: $($p.ExitCode)"
+          if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 3010) { throw "vs_installer failed with $($p.ExitCode)" }
+          $targets = Join-Path $installPath 'MSBuild\Microsoft\WindowsXaml\v10.0.19041.0\Microsoft.Windows.UI.Xaml.CSharp.targets'
+          if (-not (Test-Path $targets)) { throw "UWP XAML targets still missing: $targets" }
+          Write-Host "UWP targets OK: $targets"
 
       - name: Restore NuGet packages
         run: |
