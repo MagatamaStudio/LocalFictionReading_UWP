@@ -37,11 +37,7 @@ jobs:
           if (-not $found) { throw "UWP XAML targets still missing under $xamlRoot" }
           Write-Host "UWP XAML targets found:"
           $found | ForEach-Object { Write-Host "  $($_.FullName)" }
-
-          $required = Join-Path $installPath 'MSBuild\Microsoft\WindowsXaml\v10.0.19041.0\Microsoft.Windows.UI.Xaml.CSharp.targets'
-          if (-not (Test-Path $required)) {
-            throw "缺少本项目要求的 v10.0.19041.0 targets：$required（上面列出的版本与本工程 TargetPlatformVersion=10.0.19041.0 不匹配）"
-          }
+          # csproj 里会按 VisualStudioVersion / v17.0 自动挑选目录，这里只确认 workload 装上了即可
 
       - name: Restore NuGet packages
         run: |

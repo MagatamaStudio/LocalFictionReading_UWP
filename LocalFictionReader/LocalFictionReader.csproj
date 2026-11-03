@@ -12,7 +12,18 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <DefaultLanguage>zh-CN</DefaultLanguage>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(TargetPlatformVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <!--
+    UWP 的 XAML targets 目录按 VS 版本号命名（VS2022 = v17.0），
+    老模板里写的 v10.0.19041.0（按 TargetPlatformVersion）在 VS2017 之后就不存在了，
+    会直接报 MSB4226。这里按“VisualStudioVersion → v17.0 → TargetPlatformVersion”的顺序探测。
+  -->
+  <PropertyGroup>
+    <WindowsXamlTargetsRoot>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml</WindowsXamlTargetsRoot>
+    <WindowsXamlTargetsVersion Condition="Exists('$(WindowsXamlTargetsRoot)\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets')">v$(VisualStudioVersion)</WindowsXamlTargetsVersion>
+    <WindowsXamlTargetsVersion Condition="'$(WindowsXamlTargetsVersion)' == '' and Exists('$(WindowsXamlTargetsRoot)\v17.0\Microsoft.Windows.UI.Xaml.CSharp.targets')">v17.0</WindowsXamlTargetsVersion>
+    <WindowsXamlTargetsVersion Condition="'$(WindowsXamlTargetsVersion)' == ''">v$(TargetPlatformVersion)</WindowsXamlTargetsVersion>
+  </PropertyGroup>
+  <Import Project="$(WindowsXamlTargetsRoot)\$(WindowsXamlTargetsVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>7.0.3</Version>
