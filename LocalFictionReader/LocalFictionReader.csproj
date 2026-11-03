@@ -73,8 +73,11 @@
   </PropertyGroup>
   <Import Project="$(WindowsXamlTargetsRoot)\$(WindowsXamlTargetsVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <ItemGroup>
+    <!-- 注意：Microsoft.NETCore.UniversalWindowsPlatform 官方最高只到 6.2.15，
+         原来写的 7.0.3 在 NuGet 上根本不存在，导致 UWP 的 .NET Core 引用程序集全部缺失，
+         XAML 编译器进而报 WMC1006 "Type universe cannot resolve assembly: System.Runtime"。 -->
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>7.0.3</Version>
+      <Version>6.2.15</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Mvvm">
       <Version>7.1.2</Version>
