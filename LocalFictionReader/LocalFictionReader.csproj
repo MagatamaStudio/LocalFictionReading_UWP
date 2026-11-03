@@ -25,6 +25,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="3.1.7" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
+    <!-- UWP/CoreCLR 默认只注册 UTF-8/UTF-16 等少量编码，缺少 GBK(936)。不引入本包并注册 provider，
+         BookParserService 的 GBK 回退会抛异常，中文 txt 仍然乱码。 -->
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
