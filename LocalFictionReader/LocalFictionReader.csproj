@@ -82,6 +82,11 @@
     <PackageReference Include="Microsoft.Toolkit.Mvvm">
       <Version>7.1.2</Version>
     </PackageReference>
+    <!-- App.xaml.cs 用 Microsoft.Extensions.DependencyInjection 搭 Ioc，但 Toolkit.Mvvm 并不传递引用它，
+         不显式声明就会 CS0234: 'Extensions' does not exist in namespace 'Microsoft'。 -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>5.0.2</Version>
+    </PackageReference>
     <!-- 说明：原来的 Microsoft.NETCore.Platforms / Microsoft.NETCore.Targets 是 NuGet 2.x 时代的
          RID 选择辅助包，UWP 工程里会把 netcore 的 System.Runtime 门面扯进来，导致 XAML 编译器报
          WMC1006 "Type universe cannot resolve assembly: System.Runtime, Version=4.0.0.0"，已移除。
